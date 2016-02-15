@@ -76,7 +76,7 @@ def ShowBrowser(show_url, show_name, show_thumb, page_num=1):
 		))
 
 	# Check for a next page link
-	if len(html.xpath('//a[@class="next_page"]')) > 0:
+	if len(html.xpath('//a[contains(@class, "next_page")]')) > 0:
 
 		oc.add(NextPageObject(
 			key = Callback(ShowBrowser, show_url=show_url, show_name=show_name, show_thumb=show_thumb, page_num=page_num+1),
