@@ -31,7 +31,7 @@ def MainMenu():
 	for show in HTML.ElementFromURL(ESCAPIST_GALERIES).xpath('//a[@class="archive_container"]'):
 
 		title = show.xpath('./text()')[0]
-		url = show.xpath('.//@href')[0]
+		url = show.xpath('./@href')[0]
 
 		try: thumb = 'http://%s' % (show.xpath('.//img/@src')[0].split('//')[-1])
 		except: thumb = ''
