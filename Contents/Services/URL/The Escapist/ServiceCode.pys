@@ -41,9 +41,22 @@ def MediaObjectsForURL(url):
 
 	return [
 		MediaObject(
-			parts = [PartObject(key=Callback(PlayVideo, url=url, post_url=url))],
+			parts = [
+				PartObject(key=Callback(PlayVideo, url=url, resolution='480', post_url=url))
+			],
 			container = Container.MP4,
-			video_resolution = 'sd',
+			video_resolution = '480',
+			video_codec = VideoCodec.H264,
+			audio_codec = AudioCodec.AAC,
+			audio_channels = 2,
+			optimized_for_streaming = True
+		),
+		MediaObject(
+			parts = [
+				PartObject(key=Callback(PlayVideo, url=url, resolution='360', post_url=url))
+			],
+			container = Container.MP4,
+			video_resolution = '360',
 			video_codec = VideoCodec.H264,
 			audio_codec = AudioCodec.AAC,
 			audio_channels = 2,
@@ -53,7 +66,7 @@ def MediaObjectsForURL(url):
 
 ####################################################################################################
 @indirect
-def PlayVideo(url):
+def PlayVideo(url, resolution='480', **kwargs):
 
 	page_content = HTTP.Request(url).content
 
@@ -98,15 +111,17 @@ def PlayVideo(url):
 		data += chr(ord(t[o]) ^ ord(a[o]))
 
 	data = JSON.ObjectFromString(data)
-	video_url = None
-	quality = Prefs['quality']
+	available = {}
 
 	for item in data["files"]["videos"]:
 		if item["type"] == "video/mp4":
-			if item['res'] == int(quality[:-1]):
-				video_url = item["src"]
+			available[str(item["res"])] = item["src"]
 
-	if video_url == None:
+	if resolution == '480' and '480' in available:
+		video_url = available['480']
+	elif resolution in ['480', '360'] and '360' in available:
+		video_url = available['360']
+	else:
 		raise Ex.MediaNotAvailable
 
 	return IndirectResponse(VideoClipObject, key=video_url)
